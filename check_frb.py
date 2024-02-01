@@ -24,7 +24,7 @@ def guess_dm(filename):
     else:
         raise ValueError("Could not guess DM from filename: " + filename)
 
-def main(relfilterbankfile, dm, dmrange, display, *, threshold=8, dry_run=False, quiet=False, noclip=False, ignorechan="", skip_processed=False):
+def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, ignorechan="", skip_processed=False):
     assert(relfilterbankfile.endswith(".fil"))
 
     stdout = None
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--display", "-d", help="Display result in Evince", action="store_true")
     parser.add_argument("--dm", "-dm", help="Center DM (the DM which we expect)", type=float)
     parser.add_argument("--dmrange", "-dmrange", help="Total DM range, default 20", default=20, type=int)
-    parser.add_argument("--threshold", "-t", help="Sigma threshold for single_pulse_search", default=8, type=float)
+    parser.add_argument("--threshold", "-t", help="Sigma threshold for single_pulse_search", default=6, type=float)
     parser.add_argument("--quiet", "-q", help="Quiet mode", action='store_true')
     parser.add_argument("--noclip", "-noclip", help="Pass -noclip to prepsubband", action='store_true')
     parser.add_argument("--ignorechan", "-ignorechan", help="Ignorechan", default="")

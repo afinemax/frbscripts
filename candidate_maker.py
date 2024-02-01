@@ -78,7 +78,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Parse singlepulse file, run 'your' candidate processing on high sigma detections, save h5 and png")
     parser.add_argument("singlepulsefiles", nargs='+')
     parser.add_argument("-f", "--filterbankfile", help="Filterbank file (default: derived from singlepulse file, one directory up)")
-    parser.add_argument("-s", "--sigma", help="Sigma (default 5.0)", default=5.0, type=float)
+    parser.add_argument("-s", "--sigma", help="Sigma (default 5.0)", default=6.0, type=float)
     parser.add_argument("-t", "--time", type=float, help="Do not look in the singlepulse file (just use its DM)")
     args = parser.parse_args()
 
