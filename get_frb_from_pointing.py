@@ -14,7 +14,7 @@ sources = {
         }
 
 dt = Telescope(consoleHost="console")
-time.sleep(1.5)
+time.sleep(1.2)
 
 radec = dt.radec
 
@@ -23,4 +23,5 @@ for sourcename, coord in sources.items():
     if separation < 0.1 * u.deg:
         print(sourcename)
         sys.exit(0)
+print("Not pointed at an FRB!")
 sys.exit(1)
