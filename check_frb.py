@@ -24,7 +24,7 @@ def guess_dm(filename):
     else:
         raise ValueError("Could not guess DM from filename: " + filename)
 
-def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, rfifind=True, ignorechan="", skip_processed=False):
+def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, rfifind=True, ignorechan="", skip_processed=False, zerodm=False):
     assert(relfilterbankfile.endswith(".fil"))
 
     stdout = None
@@ -80,7 +80,12 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         if not dry_run:
             subprocess.run(rfifind_command, shell=True, stdout=stdout, stderr=stderr)
 
-    prepsubband_command = f"prepsubband {noclip_option} {ignorechanoption} {rfifindoption} -nsub {nchan} -lodm {dm - dmrange / 2} -dmstep 1 -numdms {dmrange} -o {outname} -nobary {filterbankfile}"
+    zerodmoption = ""
+    if zerodm:
+        zerodmoption = "-zerodm"
+
+    prepsubband_command = f"prepsubband -ncpus 4 {noclip_option} {zerodmoption} {ignorechanoption} {rfifindoption} -nsub {nchan} -lodm {dm - dmrange / 2} -dmstep 1 -numdms {dmrange} -o {outname} -nobary {filterbankfile}"
+
     if not quiet:
         print(prepsubband_command)
     if not dry_run:
@@ -130,6 +135,7 @@ if __name__ == "__main__":
     parser.add_argument("--ignorechan", "-ignorechan", help="Ignorechan", default="")
     parser.add_argument("--dry-run", action='store_true')
     parser.add_argument("--skip-processed", "-s", action='store_true')
+    parser.add_argument("--zerodm", action='store_true')
 
     init_environment()
     args = parser.parse_args()
@@ -146,4 +152,6 @@ if __name__ == "__main__":
         dm = args.dm
         if dm is None:
             dm = guess_dm(filterbankfile)
-        main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed)
+
+        main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed, zerodm=args.zerodm)
+        
