@@ -17,6 +17,8 @@ def get_last_three_file_sizes(directory):
     files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:3]
     files = sorted(files)  # Sort last three by name
     sizes = [os.path.getsize(os.path.join(directory, file)) for file in files]
+    files += [""] * (3 - len(files))
+    sizes += [0] * (3 - len(sizes))
     return files, sizes
 
 def run_script():
