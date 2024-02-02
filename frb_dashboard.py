@@ -27,6 +27,9 @@ def run_script():
     return output, exit_code
 
 def main(stdscr):
+    # Initialize last file sizes
+    _, last_file_sizes = get_last_three_file_sizes('/data2/camrasdemo/frb')
+
     curses.curs_set(0)
     curses.start_color()  # Initialize color pairs here
 
@@ -47,12 +50,14 @@ def main(stdscr):
         stdscr.addstr(1, 1, f'Space on /data2: {disk_space:.2f} GB', disk_space_color)
 
         # File sizes
-        file_sizes, file_names = get_last_three_file_sizes('/data2/camrasdemo/frb/')
+        file_names, file_sizes = get_last_three_file_sizes('/data2/camrasdemo/frb/')
         stdscr.addstr(3, 1, 'Last three file sizes:', curses.color_pair(3))
-        for i, (filename, size) in enumerate(zip(file_sizes, file_names)):
+        for i, (filename, size) in enumerate(zip(file_names, file_sizes)):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
             size_mb = size / 1024. / 1024.
-            stdscr.addstr(4 + i, 3, f'{filename}: {size_mb:.0f} MB', size_color)
+            stdscr.addstr(4 + i, 3, f'{filename}: {size_mb:.0f} MB, {last_file_sizes[i]/1024.:.0f}', size_color)
+
+        last_file_sizes = file_sizes.copy()
 
         # Script output
         script_output, exit_code = run_script()
@@ -69,13 +74,10 @@ def main(stdscr):
         if key == ord('q'):
             break
 
-        time.sleep(1)
+        time.sleep(5)
 
 if __name__ == '__main__':
     try:
-        # Initialize last file sizes
-        last_file_sizes, _ = get_last_three_file_sizes('/data2/camrasdemo/frb')
-
         curses.wrapper(main)
 
     except KeyboardInterrupt:
