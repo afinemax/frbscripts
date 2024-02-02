@@ -24,7 +24,7 @@ def guess_dm(filename):
     else:
         raise ValueError("Could not guess DM from filename: " + filename)
 
-def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, ignorechan="", skip_processed=False):
+def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, rfifind=True, ignorechan="", skip_processed=False):
     assert(relfilterbankfile.endswith(".fil"))
 
     stdout = None
@@ -70,7 +70,17 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     ignorechanoption = ""
     if ignorechan:
         ignorechanoption = "-ignorechan " + ignorechan
-    prepsubband_command = f"prepsubband {noclip_option} {ignorechanoption} -nsub {nchan} -lodm {dm - dmrange / 2} -dmstep 1 -numdms {dmrange} -o {outname} -nobary {filterbankfile}"
+
+    rfifindoption = ""
+    if rfifind:
+        rfifind_command = f"rfifind -o {outname} {filterbankfile} -time 30"
+        rfifindoption = "-mask " + outname + "_rfifind.mask"
+        if not quiet:
+            print(rfifind_command)
+        if not dry_run:
+            subprocess.run(rfifind_command, shell=True, stdout=stdout, stderr=stderr)
+
+    prepsubband_command = f"prepsubband {noclip_option} {ignorechanoption} {rfifindoption} -nsub {nchan} -lodm {dm - dmrange / 2} -dmstep 1 -numdms {dmrange} -o {outname} -nobary {filterbankfile}"
     if not quiet:
         print(prepsubband_command)
     if not dry_run:
@@ -116,6 +126,7 @@ if __name__ == "__main__":
     parser.add_argument("--threshold", "-t", help="Sigma threshold for single_pulse_search", default=6, type=float)
     parser.add_argument("--quiet", "-q", help="Quiet mode", action='store_true')
     parser.add_argument("--noclip", "-noclip", help="Pass -noclip to prepsubband", action='store_true')
+    parser.add_argument("--no-rfifind", "-no-rfifind", help="Skip rfifind to create RFI mask", action='store_false')
     parser.add_argument("--ignorechan", "-ignorechan", help="Ignorechan", default="")
     parser.add_argument("--dry-run", action='store_true')
     parser.add_argument("--skip-processed", "-s", action='store_true')
@@ -135,4 +146,4 @@ if __name__ == "__main__":
         dm = args.dm
         if dm is None:
             dm = guess_dm(filterbankfile)
-        main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, ignorechan=args.ignorechan, skip_processed=args.skip_processed)
+        main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed)
