@@ -27,6 +27,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(threadName)s - %(levelname)s -" " %(message)s",
 )
 
+def make_output_name(filterbankname, cand):
+    base = os.path.basename(filterbankname).rstrip(".fil")
+    return f"{base}_tcand_{cand.tcand:.7f}_dm_{cand.dm:.1f}_snr_{cand.snr:.1f}.h5"
 
 def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma, time=None):
     try:
@@ -41,13 +44,13 @@ def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma, 
     if time is not None:
         dm = df.iloc[0]["DM"]  # Assumes all DM are equal, which should be the case in a singlepulse file
         cand = make_candidate(filterbankname, dm, time, 10)  # Dummy sigma
-        fout = cand.save_h5()
+        fout = cand.save_h5(fnout=make_output_name(filterbankname, cand))
         plot_h5(fout, detrend_ft=True, save=True)
         plt.close('all')
     else:
         for rownr, row in tqdm(df.iterrows(), total=len(df), leave=False):
             cand = make_candidate(filterbankname, row["DM"], row["Time (s)"], row["Sigma"])
-            fout = cand.save_h5()
+            fout = cand.save_h5(fnout=make_output_name(filterbankname, cand))
             plot_h5(fout, detrend_ft=True, save=True)
             plt.close('all')
 
@@ -80,6 +83,7 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--filterbankfile", help="Filterbank file (default: derived from singlepulse file, one directory up)")
     parser.add_argument("-s", "--sigma", help="Sigma (default 6.0)", default=6.0, type=float)
     parser.add_argument("-t", "--time", type=float, help="Do not look in the singlepulse file (just use its DM)")
+    parser.add_argument("-p", "--filterbankpath", help="Filterbank directory")
     args = parser.parse_args()
 
     filterbankfile = args.filterbankfile
@@ -91,7 +95,11 @@ if __name__ == "__main__":
             if filterbankfile == singlepulsefile:
                 raise RuntimeError("Cannot guess filterbank filename from " + singlepulsefile)
             singlepulsedir = os.path.dirname(singlepulsefile)
-            filterbankfile = os.path.abspath(os.path.join(singlepulsedir, '..', filterbankfile))
+            if args.filterbankpath:
+                filterbankdirectory = args.filterbankpath
+            else:
+                filterbankdirectory = os.path.join(singlepulsedir, '..')
+            filterbankfile = os.path.abspath(os.path.join(filterbankdirectory, filterbankfile))
         else:
             filterbankfile = args.filterbankfile
     
