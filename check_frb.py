@@ -38,16 +38,16 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     filterbankpath = os.path.dirname(filterbankfile)
 
     if skip_processed:
-        if os.path.isfile(filterbankpath + "/tmp2/pdf/" + basename + "_singlepulse.pdf"):
+        if os.path.isfile(filterbankpath + "/process/pdf/" + basename + "_singlepulse.pdf"):
             print("Already processed:", basename)
             return
 
     nchan = get_nchan(filterbankfile)
 
-    os.makedirs(filterbankpath + "/tmp2", exist_ok=True)
+    os.makedirs(filterbankpath + "/process", exist_ok=True)
 
     orig_cwd = os.getcwd()
-    os.chdir(filterbankpath + "/tmp2")
+    os.chdir(filterbankpath + "/process")
 
     noclip_option = ""
     if noclip:
