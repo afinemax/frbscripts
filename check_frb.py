@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import subprocess
 import os
 from your.formats.pysigproc import SigprocFile
+from datetime import datetime
 from tqdm import tqdm
 
 
@@ -72,13 +73,18 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         ignorechanoption = "-ignorechan " + ignorechan
 
     rfifindoption = ""
+    num_rfi_instances = None
     if rfifind:
         rfifind_command = f"rfifind -o {outname} {filterbankfile} -time 30"
         rfifindoption = "-mask " + outname + "_rfifind.mask"
         if not quiet:
             print(rfifind_command)
         if not dry_run:
-            subprocess.run(rfifind_command, shell=True, stdout=stdout, stderr=stderr)
+            with subprocess.Popen(rfifind_command, stdout=subprocess.PIPE, bufsize=1, text=True, shell=True) as p:
+                for line in p.stdout:
+                    print(line, end='')
+                    if 'RFI instances' in line:
+                        num_rfi_instances = int(line.split()[2])
 
     zerodmoption = ""
     if zerodm:
@@ -90,11 +96,22 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         print(prepsubband_command)
     if not dry_run:
         subprocess.run(prepsubband_command, shell=True, stdout=stdout, stderr=stderr)
+
+    num_pulse_candidates = 0
     singlepulse_command = f"single_pulse_search.py -b -t {threshold} {outname}*.dat"
     if not quiet:
         print(singlepulse_command)
     if not dry_run:
-        subprocess.run(singlepulse_command, shell=True, stdout=stdout, stderr=stderr)
+        with subprocess.Popen(singlepulse_command, stdout=subprocess.PIPE, bufsize=1, text=True, shell=True) as p:
+            for line in p.stdout:
+                print(line, end='')
+                if "pulse candidates" in line:
+                    num_pulse_candidates += int(line.split()[1])
+
+    if not dry_run:
+        with open(f"{basename}_DM{dm:.2f}.singlepulse", "rb") as f:
+            num_pulse_candidates_exact_dm = sum(1 for _ in f) - 1
+
     ps2pdf_command = f"ps2pdf {outname}_singlepulse.ps"
     if not quiet:
         print(ps2pdf_command)
@@ -107,6 +124,8 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         if not dry_run:
             subprocess.run(evince_command, shell=True, stderr=subprocess.DEVNULL)
 
+    if not dry_run:
+        print(os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t')
     os.chdir(orig_cwd)
 
 def init_environment():
@@ -154,4 +173,3 @@ if __name__ == "__main__":
             dm = guess_dm(filterbankfile)
 
         main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed, zerodm=args.zerodm)
-        
