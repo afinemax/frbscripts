@@ -112,7 +112,7 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     central_singlepulse_file = f"{basename}_DM{dm:.2f}.singlepulse"
     if not dry_run:
         with open(central_singlepulse_file, "rb") as f:
-            max(num_pulse_candidates_exact_dm = sum(1 for _ in f) - 1, 0)
+            num_pulse_candidates_exact_dm = max(sum(1 for _ in f) - 1, 0)
 
     ps2pdf_command = f"ps2pdf {outname}_singlepulse.ps"
     if not quiet:
