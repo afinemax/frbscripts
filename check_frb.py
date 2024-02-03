@@ -125,7 +125,7 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
             subprocess.run(evince_command, shell=True, stderr=subprocess.DEVNULL)
 
     if not dry_run:
-        print(os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t')
+        print(os.path.basename(filterbankfile), os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t')
     os.chdir(orig_cwd)
 
 def init_environment():
