@@ -6,6 +6,7 @@ import os
 from your.formats.pysigproc import SigprocFile
 from datetime import datetime
 from tqdm import tqdm
+from candidate_maker import make_candidates_for_singlepulsefile
 
 
 def get_nchan(filterbankfile):
@@ -108,8 +109,9 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
                 if "pulse candidates" in line:
                     num_pulse_candidates += int(line.split()[1])
 
+    central_singlepulse_file = f"{basename}_DM{dm:.2f}.singlepulse"
     if not dry_run:
-        with open(f"{basename}_DM{dm:.2f}.singlepulse", "rb") as f:
+        with open(central_singlepulse_file, "rb") as f:
             num_pulse_candidates_exact_dm = sum(1 for _ in f) - 1
 
     ps2pdf_command = f"ps2pdf {outname}_singlepulse.ps"
@@ -123,6 +125,9 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         print(evince_command)
         if not dry_run:
             subprocess.run(evince_command, shell=True, stderr=subprocess.DEVNULL)
+
+    if not dry_run:
+        make_candidates_for_singlepulsefile(central_singlepulse_file)
 
     if not dry_run:
         with open("process_log.csv", "a") as f:
