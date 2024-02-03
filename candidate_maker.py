@@ -31,7 +31,7 @@ def make_output_name(filterbankname, cand):
     base = os.path.basename(filterbankname).rstrip(".fil")
     return f"{base}_tcand_{cand.tcand:.7f}_dm_{cand.dm:.1f}_snr_{cand.snr:.1f}.h5"
 
-def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma, time=None, image=False):
+def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma=6, time=None, image=False):
     try:
         df = pd.read_fwf(singlepulsename)
     except pd.errors.EmptyDataError:

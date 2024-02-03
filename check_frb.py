@@ -127,11 +127,14 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
             subprocess.run(evince_command, shell=True, stderr=subprocess.DEVNULL)
 
     if not dry_run:
-        make_candidates_for_singlepulsefile(central_singlepulse_file)
-
-    if not dry_run:
         with open("process_log.csv", "a") as f:
             print(os.path.basename(filterbankfile), os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t', file=f)
+
+    if not dry_run:
+        print(f"Going to create {num_pulse_candidates_exact_dm} candidates")
+        make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
+    else:
+        print("Create candidates for {central_singlepulse_file}")
 
     os.chdir(orig_cwd)
 

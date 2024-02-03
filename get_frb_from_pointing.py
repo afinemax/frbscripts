@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from telescope import Telescope
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 import time
@@ -13,13 +12,24 @@ sources = {
         'FRB20240114A': SkyCoord(ra=321.92*u.deg, dec=4.35*u.deg)
         }
 
-dt = Telescope(consoleHost="console")
-time.sleep(1.2)
+use_telescope = True
 
-radec = dt.radec
+if use_telescope:
+    from telescope import Telescope
+    dt = Telescope(consoleHost="console")
+    time.sleep(1.2)
+
+    pointing = dt.radec
+else:
+    import vrtzmq
+    subscriber = VRTSubscriber("console", 50011)
+    metadata = subscriber.get_dt_metadata()
+    ra = current_pointing_right_ascension * u.rad
+    dec = current_pointing_declination * u.rad
+    pointing = SkyCoord(ra=ra, dec=dec)
 
 for sourcename, coord in sources.items():
-    separation = radec.separation(coord)
+    separation = pointing.separation(coord)
     if separation < 0.1 * u.deg:
         print(sourcename)
         sys.exit(0)
