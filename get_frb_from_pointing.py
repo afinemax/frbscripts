@@ -12,7 +12,7 @@ sources = {
         'FRB20240114A': SkyCoord(ra=321.92*u.deg, dec=4.35*u.deg)
         }
 
-use_telescope = True
+use_telescope = False
 
 if use_telescope:
     from telescope import Telescope
@@ -21,11 +21,11 @@ if use_telescope:
 
     pointing = dt.radec
 else:
-    import vrtzmq
+    from vrtzmq import VRTSubscriber
     subscriber = VRTSubscriber("console", 50011)
     metadata = subscriber.get_dt_metadata()
-    ra = current_pointing_right_ascension * u.rad
-    dec = current_pointing_declination * u.rad
+    ra = metadata['current_pointing_right_ascension'] * u.rad
+    dec = metadata['current_pointing_declination'] * u.rad
     pointing = SkyCoord(ra=ra, dec=dec)
 
 for sourcename, coord in sources.items():
