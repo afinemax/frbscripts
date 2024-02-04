@@ -83,7 +83,8 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         if not dry_run:
             with subprocess.Popen(rfifind_command, stdout=subprocess.PIPE, bufsize=1, text=True, shell=True) as p:
                 for line in p.stdout:
-                    print(line, end='')
+                    if not quiet:
+                        print(line, end='')
                     if 'RFI instances' in line:
                         num_rfi_instances = int(line.split()[2])
 
@@ -105,14 +106,18 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     if not dry_run:
         with subprocess.Popen(singlepulse_command, stdout=subprocess.PIPE, bufsize=1, text=True, shell=True) as p:
             for line in p.stdout:
-                print(line, end='')
+                if not quiet:
+                    print(line, end='')
                 if "pulse candidates" in line:
                     num_pulse_candidates += int(line.split()[1])
 
     central_singlepulse_file = f"{basename}_DM{dm:.2f}.singlepulse"
     if not dry_run:
-        with open(central_singlepulse_file, "rb") as f:
-            num_pulse_candidates_exact_dm = max(sum(1 for _ in f) - 1, 0)
+        try:
+            with open(central_singlepulse_file, "rb") as f:
+                num_pulse_candidates_exact_dm = max(sum(1 for _ in f) - 1, 0)
+        except FileNotFoundError:
+            num_pulse_candidates_exact_dm = "error"
 
     ps2pdf_command = f"ps2pdf {outname}_singlepulse.ps"
     if not quiet:
@@ -131,7 +136,8 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
             print(os.path.basename(filterbankfile), os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t', file=f)
 
     if not dry_run:
-        print(f"Going to create {num_pulse_candidates_exact_dm} candidates")
+        if not quiet:
+            print(f"Going to create {num_pulse_candidates_exact_dm} candidates")
         make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
     else:
         print("Create candidates for {central_singlepulse_file}")
