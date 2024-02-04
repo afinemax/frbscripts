@@ -34,7 +34,7 @@ def make_output_name(filterbankname, cand):
 def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma=6, time=None, image=False):
     try:
         df = pd.read_fwf(singlepulsename)
-    except pd.errors.EmptyDataError:
+    except (pd.errors.EmptyDataError, FileNotFoundError):
         return
 
     if "# DM" in df.columns:
