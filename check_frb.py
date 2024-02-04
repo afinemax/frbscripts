@@ -138,7 +138,10 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     if not dry_run:
         if not quiet:
             print(f"Going to create {num_pulse_candidates_exact_dm} candidates")
-        make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
+        if num_pulse_candidates_exact_dm < 1000:
+            make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
+        else:
+            print(f"Not making {num_pulse_candidates_exact_dm} candidates for {filterbankname}")
     else:
         print("Create candidates for {central_singlepulse_file}")
 
