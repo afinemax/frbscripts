@@ -9,3 +9,6 @@ screen -dmS filterbank_pband ~/frb/filterbank-pband.sh
 screen -dmS usrp_lband ~/frb/usrp-lband.sh
 sleep 1
 screen -dmS usrp_pband ~/frb/usrp-pband.sh
+sleep 2
+screen -list
+echo "Start frb_dashboard.py for a fancy dashboard"

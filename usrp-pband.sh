@@ -18,4 +18,5 @@ do
 	--ant TX/RX \
 	--progress
 
+  date -u +"%Y-%m-%dT%H:%M:%S" >> ~/frb/crashes-pband.txt
 done
