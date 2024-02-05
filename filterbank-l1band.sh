@@ -13,7 +13,7 @@ DATADIR='/data2/camrasdemo/frb'
 #OBJECT='FRB20240114A'
 OBJECT=$(~/frb/get_frb_from_pointing.py)
 
-BAND='L_Band'
+BAND='L1_Band'
 DURATION=600
 
 while true
