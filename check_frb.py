@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 import subprocess
 import os
+from glob import glob
 from your.formats.pysigproc import SigprocFile
 from datetime import datetime
 from tqdm import tqdm
@@ -139,7 +140,7 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         if num_pulse_candidates < 200:
             if not quiet:
                 print(f"Going to create <200 candidates total for all DMs")
-            for singlepulse_file in tqdm(sorted(glob("{basename}_DM*.singlepulse"))):
+            for singlepulse_file in tqdm(sorted(glob(f"{basename}_DM*.singlepulse"))):
                 make_candidates_for_singlepulsefile(filterbankfile, singlepulse_file)
         elif num_pulse_candidates_exact_dm != "error" and num_pulse_candidates_exact_dm < 1000:
             if not quiet:
