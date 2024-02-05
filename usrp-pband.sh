@@ -18,5 +18,5 @@ do
 	--ant TX/RX \
 	--progress
 
-  date -u +"%Y-%m-%dT%H:%M:%S" >> ~/frb/crashes-pband.txt
+  echo "P-band" USRP $(date -u +"%Y-%m-%dT%H:%M:%S") >> ~/frb/crashes.txt
 done
