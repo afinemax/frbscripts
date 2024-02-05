@@ -22,7 +22,7 @@ def guess_dm(filename):
     elif 'crab' in filename.lower():
         return 56
     elif 'FRB20240114A' in filename:
-        return 527.7
+        return 528
     else:
         raise ValueError("Could not guess DM from filename: " + filename)
 
