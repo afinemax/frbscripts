@@ -136,12 +136,12 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
             print(os.path.basename(filterbankfile), os.getlogin(), datetime.now().isoformat(), num_rfi_instances, num_pulse_candidates, num_pulse_candidates_exact_dm, sep='\t', file=f)
 
     if not dry_run:
-        if num_pulse_candidates < 100:
+        if num_pulse_candidates < 200:
             if not quiet:
-                print(f"Going to create <100 candidates total for all DMs")
+                print(f"Going to create <200 candidates total for all DMs")
             for singlepulse_file in tqdm(sorted(glob("{basename}_DM*.singlepulse"))):
                 make_candidates_for_singlepulsefile(filterbankfile, singlepulse_file)
-        elif num_pulse_candidates_exact_dm == "error" or num_pulse_candidates_exact_dm < 1000:
+        elif num_pulse_candidates_exact_dm != "error" and num_pulse_candidates_exact_dm < 1000:
             if not quiet:
                 print(f"Going to create {num_pulse_candidates_exact_dm} candidates for central DM")
             make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
