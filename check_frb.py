@@ -141,11 +141,11 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
             if not quiet:
                 print(f"Going to create <200 candidates total for all DMs")
             for singlepulse_file in tqdm(sorted(glob(f"{basename}_DM*.singlepulse"))):
-                make_candidates_for_singlepulsefile(filterbankfile, singlepulse_file)
+                make_candidates_for_singlepulsefile(filterbankfile, singlepulse_file, sigma=threshold)
         elif num_pulse_candidates_exact_dm != "error" and num_pulse_candidates_exact_dm < 1000:
             if not quiet:
                 print(f"Going to create {num_pulse_candidates_exact_dm} candidates for central DM")
-            make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file)
+            make_candidates_for_singlepulsefile(filterbankfile, central_singlepulse_file, sigma=threshold)
         else:
             print(f"Not making {num_pulse_candidates_exact_dm} candidates for {basename}.fil")
     else:
