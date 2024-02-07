@@ -7,9 +7,9 @@ import subprocess
 
 def get_disk_space():
     # Get available disk space in GB
-    result = subprocess.run(['df', '-h', '/data2'], stdout=subprocess.PIPE)
+    result = subprocess.run(['df', '-k', '/data2'], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8').split('\n')[1].split()
-    return float(output[3].replace("Gi", "").replace('G', '').replace(",", "."))
+    return float(output[3].replace(",", ".")) / 1024. / 1024.
 
 def get_last_three_file_sizes(directory):
     # Get the file sizes of the last three files in the specified directory
@@ -57,7 +57,11 @@ def main(stdscr):
         for i, (filename, size) in enumerate(zip(file_names, file_sizes)):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
             size_mb = size / 1024. / 1024.
-            stdscr.addstr(4 + i, 3, f'{filename}: {size_mb:.0f} MB, {last_file_sizes[i]/1024.:.0f}', size_color)
+            if 'P' in filename:
+                pad = " "
+            else:
+                pad = ""
+            stdscr.addstr(4 + i, 3, f'{filename}{pad}: {size_mb: 5.0f} MB', size_color)
 
         last_file_sizes = file_sizes.copy()
 
@@ -76,7 +80,7 @@ def main(stdscr):
         if key == ord('q'):
             break
 
-        time.sleep(5)
+        time.sleep(1)
 
 if __name__ == '__main__':
     try:
