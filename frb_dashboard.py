@@ -71,6 +71,8 @@ def main(stdscr):
         stdscr.addstr(9, 1, 'FRB from pointing:', curses.color_pair(3))
         stdscr.addstr(10, 3, script_output, script_color)
 
+        stdscr.addstr(12, 1, "Press q or Ctrl-C to exit dashboard")
+
         stdscr.refresh()
 
         # Get user input without blocking
@@ -80,7 +82,7 @@ def main(stdscr):
         if key == ord('q'):
             break
 
-        time.sleep(1)
+        time.sleep(0.8)
 
 if __name__ == '__main__':
     try:
