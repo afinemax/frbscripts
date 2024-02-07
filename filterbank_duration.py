@@ -13,4 +13,4 @@ for fname in tqdm(sys.argv[1:]):
 print("Seconds:", total_duration_seconds)
 print("Minutes:", total_duration_seconds / 60.)
 print("Hours  :", total_duration_seconds / 60. / 60.)
-print(f"Hours  : {total_duration_seconds // 3600:.0f}:{(total_duration_seconds % 3600) / 60.:.0f}")
+print(f"Hours  : {total_duration_seconds // 3600:.0f}:{(total_duration_seconds % 3600) / 60.:02.0f}")
