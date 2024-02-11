@@ -24,6 +24,8 @@ def guess_dm(filename):
         return 56
     elif 'FRB20240114A' in filename:
         return 528
+    elif 'PSRB0329+54' in filename:
+        return 27
     else:
         raise ValueError("Could not guess DM from filename: " + filename)
 
