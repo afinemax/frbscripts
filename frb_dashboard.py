@@ -5,9 +5,9 @@ import os
 import time
 import subprocess
 
-def get_disk_space():
+def get_disk_space(data_dir):
     # Get available disk space in GB
-    result = subprocess.run(['df', '-k', '/data2'], stdout=subprocess.PIPE)
+    result = subprocess.run(['df', '-k', data_dir], stdout=subprocess.PIPE)
     output = result.stdout.decode('utf-8').split('\n')[1].split()
     return float(output[3].replace(",", ".")) / 1024. / 1024.
 
@@ -24,13 +24,15 @@ def get_last_three_file_sizes(directory):
 def run_script():
     # Run the script and get the output and exit code
     result = subprocess.run(['/home_local/camrasdemo/frb/get_frb_from_pointing.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-    output = result.stdout
+    output = result.stdout + result.stderr
     exit_code = result.returncode
     return output, exit_code
 
 def main(stdscr):
+    DATA_DIR = '/data2/camrasdemo/frb/'
+
     # Initialize last file sizes
-    _, last_file_sizes = get_last_three_file_sizes('/data2/camrasdemo/frb')
+    _, last_file_sizes = get_last_three_file_sizes(DATA_DIR)
 
     curses.curs_set(0)
     curses.start_color()  # Initialize color pairs here
@@ -43,16 +45,18 @@ def main(stdscr):
     stdscr.clear()
     stdscr.nodelay(1)  # Make getch() non-blocking
 
+    data_disk = DATA_DIR.split("/")[1]
+
     while True:
         stdscr.clear()
 
         # Disk space
-        disk_space = get_disk_space()
+        disk_space = get_disk_space(DATA_DIR)
         disk_space_color = curses.color_pair(1) if disk_space < 10 else curses.color_pair(2)
-        stdscr.addstr(1, 1, f'Space on /data2: {disk_space:.2f} GB', disk_space_color)
+        stdscr.addstr(1, 1, f'Space on {data_disk}: {disk_space:.2f} GB', disk_space_color)
 
         # File sizes
-        file_names, file_sizes = get_last_three_file_sizes('/data2/camrasdemo/frb/')
+        file_names, file_sizes = get_last_three_file_sizes(DATA_DIR)
         stdscr.addstr(3, 1, 'Last three file sizes:', curses.color_pair(3))
         for i, (filename, size) in enumerate(zip(file_names, file_sizes)):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
