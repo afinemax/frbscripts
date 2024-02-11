@@ -9,7 +9,8 @@ sources = {
         'CRAB': SkyCoord(ra=83.63*u.deg, dec=22.01*u.deg),
         'FRB20220912A': SkyCoord(ra=347.27*u.deg, dec=48.71*u.deg),
         'FRB20201124A': SkyCoord(ra=77.01*u.deg, dec=26.06*u.deg),
-        'FRB20240114A': SkyCoord(ra=321.92*u.deg, dec=4.35*u.deg)
+        'FRB20240114A': SkyCoord(ra=321.92*u.deg, dec=4.35*u.deg),
+        'PSRB0329+54': SkyCoord(ra=53.25*u.deg, dec=54.58*u.deg)
         }
 
 use_telescope = False
