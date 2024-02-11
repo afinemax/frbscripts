@@ -4,7 +4,9 @@
 #trap "kill 0" EXIT
 set -e  # Stop on error
 
-DATADIR='/data2/camrasdemo/frb'
+#DATADIR='/data2/camrasdemo/frb'
+DATADIR='/data/camrasdemo/frb'
+#DATADIR='/home/cephfs/camrasdemo/frb/live'
 
 #OBJECT="CRAB"
 #OBJECT='FRB20220912A'
@@ -37,4 +39,7 @@ do
 	--channel 1 \
 	--duration $DURATION
 
+    if [ $? -ne 0 ]; then
+        echo "$BAND filterbank $(date -u +'%Y-%m-%dT%H:%M:%S')" >> ~/frb/crashes.txt
+    fi
 done
