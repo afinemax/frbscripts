@@ -28,11 +28,20 @@ def run_script():
     exit_code = result.returncode
     return output, exit_code
 
+def get_data_dir():
+    observe_vars_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'observe_vars.sh')
+    with open(observe_vars_filename, "r") as f:
+        for line in f:
+            if line.strip().startswith("DATADIR"):
+                data_dir = line.strip().split("=")[1].strip("'").strip('"')
+    return data_dir
+    #return '/data2/camrasdemo/frb/'
+
 def main(stdscr):
-    DATA_DIR = '/data2/camrasdemo/frb/'
+    data_dir = get_data_dir()
 
     # Initialize last file sizes
-    _, last_file_sizes = get_last_three_file_sizes(DATA_DIR)
+    _, last_file_sizes = get_last_three_file_sizes(data_dir)
 
     curses.curs_set(0)
     curses.start_color()  # Initialize color pairs here
@@ -45,18 +54,18 @@ def main(stdscr):
     stdscr.clear()
     stdscr.nodelay(1)  # Make getch() non-blocking
 
-    data_disk = DATA_DIR.split("/")[1]
+    data_disk = data_dir.split("/")[1]
 
     while True:
         stdscr.clear()
 
         # Disk space
-        disk_space = get_disk_space(DATA_DIR)
+        disk_space = get_disk_space(data_dir)
         disk_space_color = curses.color_pair(1) if disk_space < 10 else curses.color_pair(2)
         stdscr.addstr(1, 1, f'Space on {data_disk}: {disk_space:.2f} GB', disk_space_color)
 
         # File sizes
-        file_names, file_sizes = get_last_three_file_sizes(DATA_DIR)
+        file_names, file_sizes = get_last_three_file_sizes(data_dir)
         stdscr.addstr(3, 1, 'Last three file sizes:', curses.color_pair(3))
         for i, (filename, size) in enumerate(zip(file_names, file_sizes)):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
