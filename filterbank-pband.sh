@@ -1,22 +1,11 @@
 #!/bin/bash
 
-#trap "exit" INT TERM ERR
-#trap "kill 0" EXIT
 set -e  # Stop on error
 
-#DATADIR='/data2/camrasdemo/frb'
-DATADIR='/data/camrasdemo/frb'
-#DATADIR='/home/cephfs/camrasdemo/frb/live'
-
-#OBJECT="CRAB"
-#OBJECT='FRB20220912A'
-#OBJECT='FRB20201124A'
-#OBJECT='PSRJ1809-1943'
-#OBJECT='FRB20240114A'
-OBJECT=$(~/frb/get_frb_from_pointing.py)
-
 BAND='P_Band'
-DURATION=600
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/observe_vars.sh"
 
 while true
 do

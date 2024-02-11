@@ -34,5 +34,5 @@ for sourcename, coord in sources.items():
     if separation < 0.1 * u.deg:
         print(sourcename)
         sys.exit(0)
-print("Not pointed at an FRB!")
+print("Not pointed at an FRB!", file=sys.stderr)
 sys.exit(1)
