@@ -18,7 +18,7 @@ do
   ~camrasdemo/thomas/vrt-iq-tools/vrt_to_filterbank \
 	--file $DATADIR/$FILENAME \
 	--source-name $OBJECT \
-	--dt-trace \
+	$DT_TRACE \
 	--int-second \
 	--telescope-id 8 \
 	--integration-time 0.0002 \
