@@ -5,14 +5,14 @@ from your.formats.pysigproc import SigprocFile
 from tqdm import tqdm
 from argparse import ArgumentParser
 
-def main(file_list):
+def filterbank_duration(file_list, quiet=False):
     total_duration_seconds = 0
 
-    for fname in tqdm(sys.argv[1:]):
+    for fname in tqdm(file_list, disable=quiet):
         fil = SigprocFile(fname)
         total_duration_seconds += fil.native_tsamp() * fil.nspectra()
 
-    print(f"Hours  : {total_duration_seconds // 3600:.0f}:{(total_duration_seconds % 3600) / 60.:02.0f}")
+    return total_duration_seconds
 
 if __name__ == "__main__":
     parser = ArgumentParser("Show duration of filterbank files")
@@ -20,4 +20,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args.files)
+    total_duration_seconds = filterbank_duration(args.files)
+
+    print(f"Hours  : {total_duration_seconds // 3600:.0f}:{(total_duration_seconds % 3600) // 60.:02.0f}")
