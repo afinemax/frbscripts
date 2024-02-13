@@ -2,6 +2,7 @@
 
 import os
 
+import sys
 import numpy as np
 import your
 from your import Writer, Your
@@ -62,7 +63,7 @@ def combine_bands(fil_file1, fil_file2):
     for nstart in tqdm(range(0, nspectra, chunksize)):
         nsamp = min(chunksize, nspectra - nstart)
         data1 = your1.get_data(nstart=nstart, nsamp=nsamp)
-        data2 = your1.get_data(nstart=nstart, nsamp=nsamp)
+        data2 = your2.get_data(nstart=nstart, nsamp=nsamp)
         data12 = np.hstack([data2 / l2_mean, data1 / l1_mean])
         sigproc_object.append_spectra(data12, output_fil)
 
@@ -71,6 +72,13 @@ if __name__ == "__main__":
     #fil_file1 = "CRAB_L1_Band_2024_02_08_18_40_15.fil"
     #fil_file2 = "CRAB_L2_Band_2024_02_08_18_40_15.fil"
 
-    fil_file1, fil_file2 = sys.argv[1], sys.argv[2]
-
-    main(fil_file1, fil_file2)
+    if os.path.isdir(sys.argv[1]):
+        pairs = [(f1, f2) for f1 in os.listdir('.') for f2 in os.listdir('.') if f1 != f2 and f1.split("_")[2:] == f2.split("_")[2:] and sum(1 for i, (c1, c2) in enumerate(zip(f1, f2)) if c1 != c2) == 1]
+        for pair in tqdm(pairs):
+            try:
+                combine_bands(*list(sorted(pair)))
+            except AssertionError:
+                print("Skipped:", *list(sorted(pair)))
+    else:
+        fil_file1, fil_file2 = sys.argv[1], sys.argv[2]
+        combine_bands(fil_file2, fil_file2)
