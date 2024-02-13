@@ -61,8 +61,8 @@ def combine_bands(fil_file1, fil_file2):
 
     for nstart in tqdm(range(0, nspectra, chunksize)):
         nsamp = min(chunksize, nspectra - nstart)
-        data1 = your1.get_data(nstart=nstart, nsamp=chunksize)
-        data2 = your1.get_data(nstart=nstart, nsamp=chunksize)
+        data1 = your1.get_data(nstart=nstart, nsamp=nsamp)
+        data2 = your1.get_data(nstart=nstart, nsamp=nsamp)
         data12 = np.hstack([data2 / l2_mean, data1 / l1_mean])
         sigproc_object.append_spectra(data12, output_fil)
 
