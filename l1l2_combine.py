@@ -18,6 +18,9 @@ def combine_bands(fil_file1, fil_file2):
     """
     chunksize = 100000
 
+    assert "L_Band" in fil_file1 or "L1_Band" in fil_file1
+    assert "L2_Band" in fil_file2
+
     your1 = your.Your(fil_file1)
     l1_mean = your1.get_data(nstart=0, nsamp=chunksize).mean()
 
@@ -65,7 +68,9 @@ def combine_bands(fil_file1, fil_file2):
 
 
 if __name__ == "__main__":
-    fil_file1 = "CRAB_L1_Band_2024_02_08_18_40_15.fil"
-    fil_file2 = "CRAB_L2_Band_2024_02_08_18_40_15.fil"
+    #fil_file1 = "CRAB_L1_Band_2024_02_08_18_40_15.fil"
+    #fil_file2 = "CRAB_L2_Band_2024_02_08_18_40_15.fil"
+
+    fil_file1, fil_file2 = sys.argv[1], sys.argv[2]
 
     main(fil_file1, fil_file2)
