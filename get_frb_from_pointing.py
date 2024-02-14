@@ -23,8 +23,12 @@ if use_telescope:
     pointing = dt.radec
 else:
     from vrtzmq import VRTSubscriber
-    subscriber = VRTSubscriber("console", 50011)
-    metadata = subscriber.get_dt_metadata()
+    try:
+        subscriber = VRTSubscriber("console", 50011)
+        metadata = subscriber.get_dt_metadata()
+    except TimeoutError:
+        print("Cannot get pointing from console!", file=sys.stderr)
+        sys.exit(1)
     ra = metadata['current_pointing_right_ascension'] * u.rad
     dec = metadata['current_pointing_declination'] * u.rad
     pointing = SkyCoord(ra=ra, dec=dec)

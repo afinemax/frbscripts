@@ -9,7 +9,7 @@ do
   ~camrasdemo/thomas/vrt-iq-tools/usrp_to_vrt --rate 20e6 \
 	--freq 410e6 \
 	--gain 30 \
-	--usrp-channel 0\
+	--usrp-channel 0,1 \
 	--int-second \
 	--ref external \
 	--merge-address console \

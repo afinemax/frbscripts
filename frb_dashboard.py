@@ -11,14 +11,14 @@ def get_disk_space(data_dir):
     output = result.stdout.decode('utf-8').split('\n')[1].split()
     return float(output[3].replace(",", ".")) / 1024. / 1024.
 
-def get_last_three_file_sizes(directory):
-    # Get the file sizes of the last three files in the specified directory
+def get_last_four_file_sizes(directory):
+    # Get the file sizes of the last four files in the specified directory
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:3]
-    files = sorted(files)  # Sort last three by name
+    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:4]
+    files = sorted(files)  # Sort last four by name
     sizes = [os.path.getsize(os.path.join(directory, file)) for file in files]
-    files += [""] * (3 - len(files))
-    sizes += [0] * (3 - len(sizes))
+    files += [""] * (4 - len(files))
+    sizes += [0] * (4 - len(sizes))
     return files, sizes
 
 def run_script():
@@ -41,7 +41,7 @@ def main(stdscr):
     data_dir = get_data_dir()
 
     # Initialize last file sizes
-    _, last_file_sizes = get_last_three_file_sizes(data_dir)
+    _, last_file_sizes = get_last_four_file_sizes(data_dir)
 
     curses.curs_set(0)
     curses.start_color()  # Initialize color pairs here
@@ -65,8 +65,8 @@ def main(stdscr):
         stdscr.addstr(1, 1, f'Space on {data_disk}: {disk_space:.2f} GB', disk_space_color)
 
         # File sizes
-        file_names, file_sizes = get_last_three_file_sizes(data_dir)
-        stdscr.addstr(3, 1, 'Last three file sizes:', curses.color_pair(3))
+        file_names, file_sizes = get_last_four_file_sizes(data_dir)
+        stdscr.addstr(3, 1, 'Last four file sizes:', curses.color_pair(3))
         for i, (filename, size) in enumerate(zip(file_names, file_sizes)):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
             size_mb = size / 1024. / 1024.

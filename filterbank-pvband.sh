@@ -2,7 +2,7 @@
 
 set -e  # Stop on error
 
-BAND='P_Band'
+BAND='PV_Band'
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/observe_vars.sh"
@@ -20,6 +20,7 @@ do
 	--source-name $OBJECT \
 	$DT_TRACE \
 	--int-second \
+	--channel 1 \
 	--telescope-id 8 \
 	--integration-time 0.0002 \
 	--num-bins 160 \
