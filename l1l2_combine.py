@@ -73,7 +73,7 @@ if __name__ == "__main__":
     #fil_file2 = "CRAB_L2_Band_2024_02_08_18_40_15.fil"
 
     if os.path.isdir(sys.argv[1]):
-        pairs = [(f1, f2) for f1 in os.listdir('.') for f2 in os.listdir('.') if f1 != f2 and f1.split("_")[2:] == f2.split("_")[2:] and sum(1 for i, (c1, c2) in enumerate(zip(f1, f2)) if c1 != c2) == 1]
+        pairs = [(f1,f2) for f1 in glob(f"{sys.argv[1]}/*L1_Band*fil") for f2 in glob(f"{sys.argv[1]}/*L2_Band*fil") if f1.split("_")[2:] == f2.split("_")[2:]]
         for pair in tqdm(pairs):
             try:
                 combine_bands(*list(sorted(pair)))
