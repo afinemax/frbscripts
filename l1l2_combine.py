@@ -81,4 +81,4 @@ if __name__ == "__main__":
                 print("Skipped:", *list(sorted(pair)))
     else:
         fil_file1, fil_file2 = sys.argv[1], sys.argv[2]
-        combine_bands(fil_file2, fil_file2)
+        combine_bands(fil_file1, fil_file2)
