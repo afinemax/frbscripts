@@ -8,6 +8,7 @@ from argparse import ArgumentParser
 import pandas as pd
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from multiprocessing import Pool
 
 from your.candidate import Candidate
 from your.utils.plotter import plot_h5
@@ -26,6 +27,14 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(threadName)s - %(levelname)s -" " %(message)s",
 )
+
+def process_row(args):
+    row, filterbankname, image = args
+    cand = make_candidate(filterbankname, row["DM"], row["Time (s)"], row["Sigma"])
+    fout = cand.save_h5(fnout=make_output_name(filterbankname, cand))
+    if image:
+        plot_h5(fout, detrend_ft=True, save=True)
+        plt.close('all')
 
 def make_output_name(filterbankname, cand):
     base = os.path.basename(filterbankname).rstrip(".fil")
@@ -49,12 +58,10 @@ def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma=6
             plot_h5(fout, detrend_ft=True, save=True)
             plt.close('all')
     else:
-        for rownr, row in tqdm(df.iterrows(), total=len(df), leave=False):
-            cand = make_candidate(filterbankname, row["DM"], row["Time (s)"], row["Sigma"])
-            fout = cand.save_h5(fnout=make_output_name(filterbankname, cand))
-            if (image):
-                plot_h5(fout, detrend_ft=True, save=True)
-                plt.close('all')
+        pool = Pool(processes=8)
+        args_generator = ((row, filterbankname, image) for rownr, row in df.iterrows())
+        for _ in tqdm(pool.imap(process_row, args_generator), total=len(df)):
+            pass
 
 
 def make_candidate(filterbankname, dm, tcand, sigma):
