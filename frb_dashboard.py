@@ -14,11 +14,11 @@ def get_disk_space(data_dir):
 def get_last_four_file_sizes(directory):
     # Get the file sizes of the last four files in the specified directory
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:4]
+    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:3]
     files = sorted(files)  # Sort last four by name
     sizes = [os.path.getsize(os.path.join(directory, file)) for file in files]
-    files += [""] * (4 - len(files))
-    sizes += [0] * (4 - len(sizes))
+    files += [""] * (3 - len(files))
+    sizes += [0] * (3 - len(sizes))
     return files, sizes
 
 def run_script():
@@ -71,7 +71,7 @@ def main(stdscr):
             size_color = curses.color_pair(1) if size == last_file_sizes[i] else curses.color_pair(2)
             size_mb = size / 1024. / 1024.
             if 'P' in filename:
-                pad = " "
+                pad = ""
             else:
                 pad = ""
             stdscr.addstr(4 + i, 3, f'{filename}{pad}: {size_mb: 5.0f} MB', size_color)
