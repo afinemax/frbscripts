@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e  # Stop on error
-
 BAND='PV_Band'
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
