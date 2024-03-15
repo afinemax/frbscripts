@@ -60,7 +60,8 @@ def make_candidates_for_singlepulsefile(filterbankname, singlepulsename, sigma=6
     else:
         pool = Pool(processes=8)
         args_generator = ((row, filterbankname, image) for rownr, row in df.iterrows())
-        for _ in tqdm(pool.imap(process_row, args_generator), total=len(df)):
+        #for _ in tqdm(pool.imap(process_row, args_generator), total=len(df)):
+        for _ in pool.imap(process_row, args_generator):
             pass
 
 
