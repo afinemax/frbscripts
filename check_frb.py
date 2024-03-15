@@ -43,7 +43,7 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     filterbankpath = os.path.dirname(filterbankfile)
 
     if skip_processed:
-        if os.path.isfile(filterbankpath + "/process/pdf/" + basename + "_singlepulse.pdf"):
+        if os.path.isfile(filterbankpath + "/process/" + basename + "_singlepulse.pdf"):
             print("Already processed:", basename)
             return
 
@@ -142,7 +142,7 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         if num_pulse_candidates < 200:
             if not quiet:
                 print(f"Going to create <200 candidates total for all DMs")
-            for singlepulse_file in tqdm(sorted(glob(f"{basename}_DM*.singlepulse"))):
+            for singlepulse_file in sorted(glob(f"{basename}_DM*.singlepulse")):
                 make_candidates_for_singlepulsefile(filterbankfile, singlepulse_file, sigma=threshold)
         elif num_pulse_candidates_exact_dm != "error" and num_pulse_candidates_exact_dm < 1000:
             if not quiet:
@@ -200,4 +200,7 @@ if __name__ == "__main__":
         if dm is None:
             dm = guess_dm(filterbankfile)
 
-        main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed, zerodm=args.zerodm, time=args.time)
+        try:
+            main(filterbankfile, dm, args.dmrange, args.display, threshold=args.threshold, dry_run=args.dry_run, quiet=args.quiet, noclip=args.noclip, rfifind=args.no_rfifind, ignorechan=args.ignorechan, skip_processed=args.skip_processed, zerodm=args.zerodm, time=args.time)
+        except:
+            print("Error with", filterbankfile)
