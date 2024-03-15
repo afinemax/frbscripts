@@ -17,7 +17,7 @@ else:
     folders_to_search = sys.argv[1:]
 
 for folder in folders_to_search:
-    for band in ["L_", "L1_", "L2_", "P_"]:
+    for band in ["L_", "L1_", "L2_", "P_", "PH", "PV"]:
         for source in ["PSRB0329", "FRB20220912A", "FRB20240114A", "CRAB", "FRB20201124A"]:
             pattern = f"{folder}/{source}*{band}*fil"
             file_list = sorted(glob(pattern))
