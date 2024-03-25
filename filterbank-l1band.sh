@@ -4,6 +4,7 @@ BAND='L1_Band'
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$SCRIPT_DIR/observe_vars.sh"
+source "${SCRIPT_DIR}/pushover_keys.sh"
 
 while true
 do
@@ -27,5 +28,6 @@ do
 
     if [ $? -ne 0 ]; then
         echo "$BAND filterbank $(date -u +'%Y-%m-%dT%H:%M:%S')" >> ~/frb/crashes.txt
+	curl -s --form-string "token=${PUSHOVER_APP_TOKEN}" --form-string "user=${PUSHOVER_USER_KEY}" --form-string 'message=Filterbank L1-band crashed' https://api.pushover.net/1/messages.json
     fi
 done
