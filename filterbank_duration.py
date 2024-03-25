@@ -23,3 +23,4 @@ if __name__ == "__main__":
     total_duration_seconds = filterbank_duration(args.files)
 
     print(f"Hours  : {total_duration_seconds // 3600:.0f}:{(total_duration_seconds % 3600) // 60.:02.0f}")
+    print(f"Seconds: {total_duration_seconds}")

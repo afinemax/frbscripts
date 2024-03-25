@@ -5,6 +5,8 @@ import os
 import time
 import subprocess
 
+NUM_BANDS = 4
+
 def get_disk_space(data_dir):
     # Get available disk space in GB
     result = subprocess.run(['df', '-k', data_dir], stdout=subprocess.PIPE)
@@ -14,11 +16,11 @@ def get_disk_space(data_dir):
 def get_last_four_file_sizes(directory):
     # Get the file sizes of the last four files in the specified directory
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:3]
+    files = sorted(files, key=lambda f: os.path.getctime(os.path.join(directory, f)), reverse=True)[:NUM_BANDS]
     files = sorted(files)  # Sort last four by name
     sizes = [os.path.getsize(os.path.join(directory, file)) for file in files]
-    files += [""] * (3 - len(files))
-    sizes += [0] * (3 - len(sizes))
+    files += [""] * (NUM_BANDS - len(files))
+    sizes += [0] * (NUM_BANDS - len(sizes))
     return files, sizes
 
 def run_script():
@@ -62,7 +64,7 @@ def main(stdscr):
         # Disk space
         disk_space = get_disk_space(data_dir)
         disk_space_color = curses.color_pair(1) if disk_space < 10 else curses.color_pair(2)
-        stdscr.addstr(1, 1, f'Space on {data_disk}: {disk_space:.2f} GB', disk_space_color)
+        stdscr.addstr(1, 1, f'Space on /{data_disk}: {disk_space:.2f} GB', disk_space_color)
 
         # File sizes
         file_names, file_sizes = get_last_four_file_sizes(data_dir)

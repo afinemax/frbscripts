@@ -24,4 +24,4 @@ for folder in folders_to_search:
             duration_seconds = filterbank_duration(file_list, quiet=True)
             mount = os.path.abspath(folder).split("/")[1]
             if duration_seconds > 0:
-                print(mount, folder.split("/")[-1], band, source, format_hours(duration_seconds), sep=",")
+                print(mount, folder.split("/")[-1], band, source, format_hours(duration_seconds), f"{duration_seconds/3600:.1f}", sep=",")
