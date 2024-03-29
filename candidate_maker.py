@@ -108,8 +108,10 @@ def compute_time(filterbankfile, dm, mjd2, f2_mhz):
     time_offset = (mjd_corrected - mjd_filterbank_start) * 24 * 3600
     print(f"Computed time = {time_offset} seconds since start")
     print(f"Filterbank duration: {fil.native_tsamp() * fil.nspectra():.1f} seconds")
-    if time_offset < 0 or time_offset > fil.native_tsamp() * fil.nspectra():
-        raise RuntimeError("Computed time not in filterbank")
+    if time_offset < 0:
+        raise RuntimeError("Computed time before filterbank")
+    elif time_offset > fil.native_tsamp() * fil.nspectra():
+        raise RuntimeError("Computed time after filterbank")
     return time_offset
 
 
