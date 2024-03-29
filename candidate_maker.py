@@ -11,6 +11,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 
 from your.candidate import Candidate
+from your.formats.pysigproc import SigprocFile
 from your.utils.plotter import plot_h5
 import logging
 import numpy as np
@@ -86,6 +87,31 @@ def make_candidate(filterbankname, dm, tcand, sigma):
 
     return cand
 
+def time_from_dm(f_mhz, dm):
+    """Return time in seconds, to be used in a relative way"""
+    return 4149 * dm / f_mhz**2
+
+def get_mjd(mjd1, freq1_mhz, freq2_mhz, dm):
+    """Get MJD at freq2_mhz, given detection at mjd1 at freq1_mhz"""
+    offset1_s = time_from_dm(freq1_mhz, dm)
+    offset2_s = time_from_dm(freq2_mhz, dm)
+    return mjd1 + (offset2_s - offset1_s) / (24 * 3600)
+
+def compute_time(filterbankfile, dm, mjd2, f2_mhz):
+    fil = SigprocFile(filterbankfile)
+
+    freq_filterbank_mhz = fil.fch1
+    mjd_filterbank_start = fil.tstart
+    print(freq_filterbank_mhz, mjd_filterbank_start)
+
+    mjd_corrected = get_mjd(mjd2, f2_mhz, freq_filterbank_mhz, dm)
+    time_offset = mjd_corrected - mjd_filterbank_start
+    print(f"Computed time = {time_offset} seconds since start")
+    print(f"Filterbank duration: {fil.native_tsamp() * fil.nspectra():.1f} seconds")
+    if time_offset < 0 or time_offset > fil.native_tsamp() * fil.nspectra():
+        raise RuntimeError("Computed time not in filterbank")
+    return time_offset
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Create candidates with your from a filterbank. Candidates can be specified manually or take nfrom a singlepulsefile.")
@@ -96,6 +122,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--image", help="Create PNG files", action='store_true')
     parser.add_argument("-p", "--filterbankpath", help="Filterbank directory")
     parser.add_argument("-dm", "--dm", help="DM (default: taken from singlepulse file)", default=None, type=float)
+    parser.add_argument("-f2", help="Frequency in MHz (!) at which the time is specified. Time in filterbank will be shifted based on start time and DM. With this argument, -t is interpreted as mjd", type=float, default=None)
     args = parser.parse_args()
 
     filterbankfile = args.filterbankfile
@@ -103,12 +130,18 @@ if __name__ == "__main__":
     if len(args.singlepulsefiles) == 0 and args.filterbankfile:
         if args.dm is None:
             raise RuntimeError("If no singlepulse-files are given, you need to specify --dm")
-        cand = make_candidate(args.filterbankfile, args.dm, args.time, 10)
+        if args.f2:
+            time = compute_time(args.filterbankfile, args.dm, args.time, args.f2)
+        else:
+            time = args.time
+        cand = make_candidate(args.filterbankfile, args.dm, time, 0)
         fout = cand.save_h5(fnout=make_output_name(args.filterbankfile, cand))
         if args.image:
             plot_h5(fout, detrend_ft=True, save=True)
 
     for singlepulsefile in tqdm(args.singlepulsefiles):
+        if args.f2 is not None:
+            raise RuntimeError("--f2 is not supported for use with a singlepulsefile")
         if args.filterbankfile is None:
             # FRB20220912A_435_snip_DM222.00.singlepulse
             filterbankfile = re.sub(r'_DM([\d.]+).singlepulse$', '.fil', singlepulsefile)
