@@ -89,15 +89,24 @@ def make_candidate(filterbankname, dm, tcand, sigma):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Parse singlepulse file, run 'your' candidate processing on high sigma detections, save h5 and png")
-    parser.add_argument("singlepulsefiles", nargs='+')
+    parser.add_argument("singlepulsefiles", nargs='*')
     parser.add_argument("-f", "--filterbankfile", help="Filterbank file (default: derived from singlepulse file, one directory up)")
     parser.add_argument("-s", "--sigma", help="Sigma (default 6.0)", default=6.0, type=float)
     parser.add_argument("-t", "--time", type=float, help="Do not look in the singlepulse file (just use its DM)")
     parser.add_argument("-i", "--image", help="Create PNG files", action='store_true')
     parser.add_argument("-p", "--filterbankpath", help="Filterbank directory")
+    parser.add_argument("-dm", "--dm", help="DM (default: taken from singlepulse file)", default=None, type=float)
     args = parser.parse_args()
 
     filterbankfile = args.filterbankfile
+
+    if len(args.singlepulsefiles) == 0 and args.filterbankfile:
+        if args.dm is None:
+            raise RuntimeError("If no singlepulse-files are given, you need to specify --dm")
+        cand = make_candidate(args.filterbankfile, args.dm, args.time, 10)
+        fout = cand.save_h5(fnout=make_output_name(args.filterbankfile, cand))
+        if args.image:
+            plot_h5(fout, detrend_ft=True, save=True)
 
     for singlepulsefile in tqdm(args.singlepulsefiles):
         if args.filterbankfile is None:

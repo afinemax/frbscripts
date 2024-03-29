@@ -14,7 +14,7 @@ bad  = df[df['label'] == 0.0]
 try:
     os.mkdir("good")
     os.mkdir("bad")
-except:
+except FileExistsError:
     pass
 
 for fname in good['candidate']:
