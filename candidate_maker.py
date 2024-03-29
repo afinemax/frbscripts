@@ -105,7 +105,7 @@ def compute_time(filterbankfile, dm, mjd2, f2_mhz):
     print(freq_filterbank_mhz, mjd_filterbank_start)
 
     mjd_corrected = get_mjd(mjd2, f2_mhz, freq_filterbank_mhz, dm)
-    time_offset = mjd_corrected - mjd_filterbank_start
+    time_offset = (mjd_corrected - mjd_filterbank_start) * 24 * 3600
     print(f"Computed time = {time_offset} seconds since start")
     print(f"Filterbank duration: {fil.native_tsamp() * fil.nspectra():.1f} seconds")
     if time_offset < 0 or time_offset > fil.native_tsamp() * fil.nspectra():
