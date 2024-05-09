@@ -18,7 +18,6 @@ do
 	--source-name $OBJECT \
 	$DT_TRACE \
 	--int-second \
-	--channel 1 \
 	--telescope-id 8 \
 	--integration-time 0.0002 \
 	--num-bins 160 \
