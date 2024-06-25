@@ -4,14 +4,39 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 import time
 import sys
+import os 
 
-sources = {
-        'CRAB': SkyCoord(ra=83.63*u.deg, dec=22.01*u.deg),
-        'FRB20220912A': SkyCoord(ra=347.27*u.deg, dec=48.71*u.deg),
-        'FRB20201124A': SkyCoord(ra=77.01*u.deg, dec=26.06*u.deg),
-        'FRB20240114A': SkyCoord(ra=321.92*u.deg, dec=4.33*u.deg),
-        'PSRB0329+54': SkyCoord(ra=53.25*u.deg, dec=54.58*u.deg)
-        }
+# catalog file of sources, located in the same dir as this script
+catalog_file = 'frb.cat' # name dm (pc/cm^3) ra (deg) dec (deg)
+
+
+def load_sources_catalog(filename):
+    '''This function reads the frb.cat file and creates a dictionary of SkyCoord objects.'''
+    # Get the directory path where the script is located
+    script_dir = os.path.dirname(__file__)
+
+    # Create the full path to the local file using os.path.join()
+    local_file = os.path.join(script_dir, filename)
+
+    # Check if the file exists
+    if not os.path.isfile(local_file):
+        raise FileNotFoundError(f"The file {local_file} does not exist.")
+    
+    sources_catalog = {}
+    with open(local_file, 'r') as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue  # Skip comment lines and empty lines
+            parts = line.split()
+            name = parts[0]
+            ra = float(parts[2])
+            dec = float(parts[3])
+            sources_catalog[name.upper()] = SkyCoord(ra=ra * u.deg, dec=dec * u.deg)
+    
+    return sources_catalog
+
+# Load the sources catalog from the file
+sources = load_sources_catalog('frb.cat')
 
 use_telescope = False
 

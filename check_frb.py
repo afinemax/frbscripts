@@ -9,25 +9,65 @@ from datetime import datetime
 from tqdm import tqdm
 from candidate_maker import make_candidates_for_singlepulsefile
 
+# ignore chan filenames 
+# should be located in same dir as this script
+p_ignore = 'p_band_master.ignorechans'
+l1_ignore = 'l1_band_master.ignorechans'
+l2_ignore = 'l2_band_master.ignorechans'
+
+# catalog file of sources, located in the same dir as this script
+catalog_file = 'frb.cat' # name dm (pc/cm^3) ra (deg) dec (deg)
+
+def read_in_ignore_chan(filename):
+    '''This function reads in the three .ignorechans files used as the ignorechanoption in prepsubband '''
+    # Get the directory path where the script is located
+    script_dir = os.path.dirname(__file__)
+
+    # Create the full path to the  local file using os.path.join()
+    local_file = os.path.join(script_dir, filename)
+    if os.path.isfile(local_file):
+        with open(local_file, 'r') as f:
+            for line in f: # there should only be one line
+                line = line.strip()
+                ignore_chans = line
+
+            return ignore_chans 
+        
 
 def get_nchan(filterbankfile):
     f = SigprocFile(filterbankfile)
     nchan = f.nchans
     return nchan
 
-def guess_dm(filename):
-    if 'FRB20201124A' in filename:
-        return 411
-    elif 'FRB20220912A' in filename:
-        return 219
-    elif 'crab' in filename.lower():
-        return 56
-    elif 'FRB20240114A' in filename:
-        return 528
-    elif 'PSRB0329+54' in filename:
-        return 27
-    else:
-        raise ValueError("Could not guess DM from filename: " + filename)
+def load_frb_catalog(catalog_file):
+    # Get the directory path where the script is located
+    script_dir = os.path.dirname(__file__)
+
+    # Create the full path to the local file using os.path.join()
+    local_file = os.path.join(script_dir, catalog_file)
+
+    frb_catalog = {}
+    if os.path.isfile(local_file):
+        with open(local_file, 'r') as f:
+            for line in f:
+                if line.startswith('#') or not line.strip():
+                    continue  # Skip comment lines and empty lines
+                parts = line.split()
+                name = parts[0]
+                dm = int(parts[1])
+                frb_catalog[name.lower()] = dm  # Store names in lowercase for case-insensitive matching
+    return frb_catalog
+
+def guess_dm(filename,):
+    frb_catalog = load_frb_catalog(catalog_file)
+
+    filename_lower = filename.lower()  # Convert the filename to lowercase for case-insensitive matching
+    for name in frb_catalog:
+        if name in filename_lower:  # Check if any catalog name is a substring of the filename
+            return frb_catalog[name]  # Return the corresponding DM value if a match is found
+    raise ValueError("Could not guess DM from filename: " + filename)
+
+
 
 def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False, quiet=False, noclip=False, rfifind=True, ignorechan="", skip_processed=False, zerodm=False, time=30):
     assert(relfilterbankfile.endswith(".fil"))
@@ -58,23 +98,25 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
     if noclip:
         noclip_option = "-noclip"
 
-    ##if "L_" in filterbankfile:
-    #    assert(nchan == 320)
-    #    ignorechan += ""  # TODO
-    #if "P_" in filterbankfile:
-    #    assert(nchan == 160)
-    #    ignorechan += ",2,3"
-    ignorechan = ignorechan.lstrip(",")
-    #else:
-    #    print("Could not deduce band from filename, don't know zapchans")
-
     outname = basename
     if noclip:
         outname += "_nc"
 
+    # create ignorechan option input
+    # reads ignore chan info from master file located in the same dir as this script
+    # if band not reconized, prints error
     ignorechanoption = ""
     if ignorechan:
-        ignorechanoption = "-ignorechan " + ignorechan
+         if "L1_" in filterbankfile:
+             ignorechan = read_in_ignore_chan(l1_ignore)
+         if 'L2_' in filterbankfile:
+             ignorechan = read_in_ignore_chan(l2_ignore)
+         if  '_P' in filterbankfile:
+             ignorechan = read_in_ignore_chan(p_ignore)
+         else:
+             print("Could not deduce band from filename, don't know zapchans")
+
+    ignorechanoption = "-ignorechan " + ignorechan
 
     rfifindoption = ""
     num_rfi_instances = None
@@ -154,6 +196,11 @@ def main(relfilterbankfile, dm, dmrange, display, *, threshold=6, dry_run=False,
         print("Create candidates for {central_singlepulse_file}")
 
     os.chdir(orig_cwd)
+
+
+
+
+
 
 def init_environment():
     os.environ["PATH"] = os.environ["PATH"] + ":/home_local/camrasdemo/psrsoft/usr/bin"
